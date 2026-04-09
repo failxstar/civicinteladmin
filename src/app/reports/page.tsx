@@ -132,13 +132,9 @@ export default function ReportsPage() {
     const updateReportStatus = async (reportId: string, status: string) => {
         setUpdating(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/reports/${reportId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status }),
-            });
+            const success = await apiService.updateReport(reportId, { status: status as any });
 
-            if (response.ok) {
+            if (success) {
                 await loadReports();
                 setSelectedReport(null);
                 alert(`Report status updated to ${status}!`);
@@ -158,11 +154,9 @@ export default function ReportsPage() {
 
         setUpdating(true);
         try {
-            const response = await fetch(`http://localhost:5000/api/reports/${reportId}`, {
-                method: 'DELETE',
-            });
+            const success = await apiService.deleteReport(reportId);
 
-            if (response.ok) {
+            if (success) {
                 await loadReports();
                 setSelectedReport(null);
                 alert('Report deleted successfully!');
@@ -183,13 +177,7 @@ export default function ReportsPage() {
         setUpdating(true);
         try {
             await Promise.all(
-                selectedReports.map(id =>
-                    fetch(`http://localhost:5000/api/reports/${id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status }),
-                    })
-                )
+                selectedReports.map(id => apiService.updateReport(id, { status: status as any }))
             );
             await loadReports();
             setSelectedReports([]);
@@ -209,11 +197,7 @@ export default function ReportsPage() {
         setUpdating(true);
         try {
             await Promise.all(
-                selectedReports.map(id =>
-                    fetch(`http://localhost:5000/api/reports/${id}`, {
-                        method: 'DELETE',
-                    })
-                )
+                selectedReports.map(id => apiService.deleteReport(id))
             );
             await loadReports();
             setSelectedReports([]);

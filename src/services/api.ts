@@ -29,7 +29,7 @@ export interface Report {
     distance?: number;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://civicintelbackend.vercel.app';
 
 class ApiService {
     /**
@@ -99,6 +99,38 @@ class ApiService {
         return reports
             .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
             .slice(0, limit);
+    }
+
+    /**
+     * Update report status on backend
+     */
+    async updateReport(reportId: string, updates: Partial<Report>): Promise<boolean> {
+        try {
+            const response = await fetch(`${API_URL}/api/reports/${reportId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('[ApiService] Error updating report:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Delete report from backend
+     */
+    async deleteReport(reportId: string): Promise<boolean> {
+        try {
+            const response = await fetch(`${API_URL}/api/reports/${reportId}`, {
+                method: 'DELETE',
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('[ApiService] Error deleting report:', error);
+            return false;
+        }
     }
 
     /**
